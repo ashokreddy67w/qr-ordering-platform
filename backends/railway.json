@@ -1,11 +1,12 @@
 {
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "ls -la && echo 'Files listed successfully'"
+    "buildCommand": "apt-get update && apt-get install -y maven && mvn clean package -DskipTests"
   },
   "deploy": {
     "startCommand": "java -jar target/*.jar",
-    "healthcheckPath": "/",
+    "healthcheckPath": "/api/admin/dashboard",
+    "healthcheckTimeout": 30,
     "restartPolicyType": "ON_FAILURE"
   }
 }
