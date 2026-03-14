@@ -1,21 +1,20 @@
 package com.qrplatform.backend.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
 
-@Data
-@AllArgsConstructor
+
 public class AdminLoginResponse {
+
     private String token;
+    private AdminUserSummaryDto admin;
 
-	public String getToken() {
-		return token;
-	}
+    public AdminLoginResponse(String token) {
+        this.token = token;
+    }
 
-	public void setToken(String token) {
-		this.token = token;
-	}
+    
 
-
-	public AdminLoginResponse() {}
+	public AdminLoginResponse(String token, AdminUserSummaryDto admin) {
+        this.token = token;
+        this.admin = admin;
+    }
 }
