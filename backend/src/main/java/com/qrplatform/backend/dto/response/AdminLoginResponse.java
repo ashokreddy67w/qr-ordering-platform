@@ -16,9 +16,6 @@ public class AdminLoginResponse {
 		this.token = token;
 	}
 
-	public AdminLoginResponse(String token) {
-		super();
-		this.token = token;
-	}
+
 	public AdminLoginResponse() {}
 }
