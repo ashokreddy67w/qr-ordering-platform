@@ -7,10 +7,11 @@ import com.qrplatform.backend.dto.response.AdminLoginResponse;
 import com.qrplatform.backend.exception.AdminNotFoundException;
 import com.qrplatform.backend.exception.InvalidTokenException;
 import com.qrplatform.backend.service.AdminService;
-import com.qrplatform.backend.service.RateLimiterService;
 import com.qrplatform.backend.security.JwtUtil;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -28,30 +29,24 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
     private final AdminService adminService;
-    private final RateLimiterService rateLimiterService;
 
-    // Explicit constructor
     public AuthController(AuthenticationManager authenticationManager,
                           JwtUtil jwtUtil,
-                          AdminService adminService,
-                          RateLimiterService rateLimiterService) {
+                          AdminService adminService) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.adminService = adminService;
-        this.rateLimiterService = rateLimiterService;
     }
 
     @PostMapping("/login")
     public ResponseEntity<AdminLoginResponse> login(@Valid @RequestBody AdminLoginRequest request,
-                                                    HttpServletRequest httpRequest) {
-        String clientIp = httpRequest.getRemoteAddr();
-
-        if (!rateLimiterService.isAllowed("login:" + clientIp, 5, 60)) {
-            throw new RuntimeException("Too many login attempts. Please try again later.");
-        }
+                                                   HttpServletRequest httpRequest) {
 
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+                new UsernamePasswordAuthenticationToken(
+                        request.getEmail(),
+                        request.getPassword()
+                )
         );
 
         String token = jwtUtil.generateToken(request.getEmail());
@@ -61,13 +56,7 @@ public class AuthController {
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<String> forgotPassword(@Valid @RequestBody AdminForgotPasswordRequest request,
-                                                  HttpServletRequest httpRequest) {
-        String clientIp = httpRequest.getRemoteAddr();
-
-        if (!rateLimiterService.isAllowed("forgot:" + clientIp, 3, 3600)) {
-            throw new RuntimeException("Too many password reset requests. Please try again later.");
-        }
+    public ResponseEntity<String> forgotPassword(@Valid @RequestBody AdminForgotPasswordRequest request) {
 
         try {
             adminService.initiatePasswordReset(request.getEmail());
@@ -81,6 +70,7 @@ public class AuthController {
 
     @PostMapping("/reset-password")
     public ResponseEntity<String> resetPassword(@Valid @RequestBody AdminResetPasswordRequest request) {
+
         try {
             adminService.completePasswordReset(request.getToken(), request.getNewPassword());
             log.info("Password reset completed for token: {}", request.getToken());
