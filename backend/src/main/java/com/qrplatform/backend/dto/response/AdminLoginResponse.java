@@ -13,6 +13,30 @@ public class AdminLoginResponse {
 
     
 
+	public String getToken() {
+		return token;
+	}
+
+
+
+	public void setToken(String token) {
+		this.token = token;
+	}
+
+
+
+	public AdminUserSummaryDto getAdmin() {
+		return admin;
+	}
+
+
+
+	public void setAdmin(AdminUserSummaryDto admin) {
+		this.admin = admin;
+	}
+
+
+
 	public AdminLoginResponse(String token, AdminUserSummaryDto admin) {
         this.token = token;
         this.admin = admin;
